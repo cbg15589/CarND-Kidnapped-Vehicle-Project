@@ -67,9 +67,23 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	// Predict each particle position based on sensor readings and motion model
 	for (int i = 0; i < num_particles; i++)
 	{
-		double pred_x = particles[i].x + ((velocity / yaw_rate)*(sin(particles[i].theta + yaw_rate*delta_t) - sin(particles[i].theta)));
-		double pred_y = particles[i].y + ((velocity / yaw_rate)*(cos(particles[i].theta) - cos(particles[i].theta + yaw_rate*delta_t)));
-		double pred_theta = particles[i].theta + yaw_rate*delta_t;
+		double pred_x;
+		double pred_y;
+		double pred_theta;
+		
+		if (fabs(yaw_rate) > 0.001)
+		{
+			pred_x = particles[i].x + ((velocity / yaw_rate)*(sin(particles[i].theta + yaw_rate*delta_t) - sin(particles[i].theta)));
+			pred_y = particles[i].y + ((velocity / yaw_rate)*(cos(particles[i].theta) - cos(particles[i].theta + yaw_rate*delta_t)));
+			pred_theta = particles[i].theta + yaw_rate*delta_t;
+		}
+		else
+		{
+			pred_x = particles[i].x + (velocity *delta_t * cos(particles[i].theta));
+			pred_y = particles[i].y + (velocity *delta_t * sin(particles[i].theta));
+			pred_theta = particles[i].theta;
+		}
+		
 
 		normal_distribution<double> dist_x(pred_x, std_pos[0]);
 		normal_distribution<double> dist_y(pred_y, std_pos[1]);
